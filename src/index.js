@@ -1,4 +1,5 @@
 const express = require('express');
+const talker = require('./talker.json');
 
 const app = express();
 app.use(express.json());
@@ -14,5 +15,7 @@ app.get('/', (_request, response) => {
 app.listen(PORT, () => {
   console.log('Online');
 });
-
 //
+
+// requisito 1
+app.get('/talker', (req, res) => res.status(HTTP_OK_STATUS).json(talker));
