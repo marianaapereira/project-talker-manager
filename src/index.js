@@ -1,5 +1,5 @@
 const express = require('express');
-const talker = require('./talker.json');
+const { readTalkersData } = require('./utils/fsUtils');
 
 const app = express();
 app.use(express.json());
@@ -18,4 +18,12 @@ app.listen(PORT, () => {
 //
 
 // requisito 1
-app.get('/talker', (req, res) => res.status(HTTP_OK_STATUS).json(talker));
+app.get('/talker', async (req, res) => {
+  try {
+    const talker = await readTalkersData();
+    return res.status(HTTP_OK_STATUS).json(talker);
+  } catch (error) {
+    console.error(`Não há pessoas palestrantes cadastradas! Mensagem de erro: ${error}`);
+    return res.status(HTTP_OK_STATUS).json([]);
+  }
+});
