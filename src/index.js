@@ -6,6 +6,7 @@ app.use(express.json());
 
 const HTTP_OK_STATUS = 200;
 const HTTP_NOT_FOUND_STATUS = 404;
+// const HTTP_CREATED_STATUS = 201;
 
 const PORT = process.env.PORT || '3001';
 
@@ -47,4 +48,24 @@ app.get('/talker/:id', async (req, res) => {
   } catch (error) {
     console.error(`Pessoa palestrante não encontrada! Mensagem de erro: ${error}`);
   }
+});
+
+// requisito 3
+function createRandomToken(tokenLength) {
+  const allowedChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let token = '';
+
+  for (let i = 0; i < tokenLength; i += 1) {
+    const randomIndex = Math.floor(Math.random() * allowedChars.length);
+    token += allowedChars.charAt(randomIndex);
+  }
+
+  return token;
+}
+
+app.post('/login', (req, res) => {
+  const desiredTokenLength = 16;
+  const token = createRandomToken(desiredTokenLength);
+
+  res.status(HTTP_OK_STATUS).json({ token });
 });
