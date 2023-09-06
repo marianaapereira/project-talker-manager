@@ -95,6 +95,6 @@ app.post('/talker', async (req, res) => {
     return validationResponseManager(res, HTTP_BAD_REQUEST_STATUS, talkerValidationResponse);
   }
 
-  await registerNewTalker(newTalkerInfo);
-  res.status(HTTP_CREATED_STATUS).json(newTalkerInfo);
+  const addedTalker = await registerNewTalker(newTalkerInfo);
+  res.status(HTTP_CREATED_STATUS).json(addedTalker);
 });
