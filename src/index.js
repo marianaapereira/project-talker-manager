@@ -1,12 +1,18 @@
 const express = require('express');
 const { readTalkersData } = require('./utils/fsUtils');
+const { userInfoValidation } = require('./utils/userValidationFunctions');
+const { createRandomToken, tokenValidation } = require('./utils/tokenFunctions');
+const { talkerValidation } = require('./utils/talkerValidationFunctions');
 
 const app = express();
 app.use(express.json());
 
 const HTTP_OK_STATUS = 200;
-const HTTP_NOT_FOUND_STATUS = 404;
 const HTTP_BAD_REQUEST_STATUS = 400;
+const HTTP_UNAUTHORIZED_STATUS = 401;
+const HTTP_NOT_FOUND_STATUS = 404;
+const HTTP_CREATED_STATUS = 201;
+
 const DESIRED_TOKEN_LENGTH = 16;
 
 const PORT = process.env.PORT || '3001';
@@ -51,42 +57,7 @@ app.get('/talker/:id', async (req, res) => {
   }
 });
 
-// requisito 3
-function createRandomToken(tokenLength) {
-  const allowedChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let token = '';
-
-  for (let i = 0; i < tokenLength; i += 1) {
-    const randomIndex = Math.floor(Math.random() * allowedChars.length);
-    token += allowedChars.charAt(randomIndex);
-  }
-
-  return token;
-}
-
-// requisito 4
-function validateEmail(email) {
-  if (!email || email === '') return 'O campo "email" é obrigatório';
-
-  const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-  const emailIsValid = regexEmail.test(email);
-
-  if (!emailIsValid) return 'O "email" deve ter o formato "email@email.com"';
-}
-
-function validatePassword(password) {
-  if (!password || password === '') return 'O campo "password" é obrigatório';
-  
-  if (password.length < 6) return 'O "password" deve ter pelo menos 6 caracteres';
-}
-
-function userInfoValidation(email, password) {
-  const emailErrorMessage = validateEmail(email);
-  if (emailErrorMessage) return emailErrorMessage;
-
-  const passwordErrorMessage = validatePassword(password);
-  if (passwordErrorMessage) return passwordErrorMessage;
-}
+// requisitos 3 e 4
 app.post('/login', (req, res) => {
   const userLoginInfo = { ...req.body };
   const { email, password } = userLoginInfo;
@@ -100,4 +71,29 @@ app.post('/login', (req, res) => {
 
   const token = createRandomToken(DESIRED_TOKEN_LENGTH);
   res.status(HTTP_OK_STATUS).json({ token });
+});
+
+function validationResponseManager(res, status, message) {
+    return res.status(status).json({
+      message,
+    });
+  }
+
+// requisito 5
+app.post('/talker', (req, res) => {
+  const token = req.headers.authorization;
+  const tokenValidationResponse = tokenValidation(token, DESIRED_TOKEN_LENGTH);
+
+  if (tokenValidationResponse) {
+    return validationResponseManager(res, HTTP_UNAUTHORIZED_STATUS, tokenValidationResponse);
+  }
+
+  const newTalkerInfo = { ...req.body };
+  const talkerValidationResponse = talkerValidation(newTalkerInfo);
+
+  if (talkerValidationResponse) {
+    return validationResponseManager(res, HTTP_BAD_REQUEST_STATUS, talkerValidationResponse);
+  }
+
+  res.status(HTTP_CREATED_STATUS).json({ newTalkerInfo });
 });
