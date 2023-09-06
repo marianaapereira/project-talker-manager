@@ -6,10 +6,14 @@ function nameValidation(name) {
   if (name.length < MINIMUN_NAME_LENGTH) return 'O "name" deve ter pelo menos 3 caracteres';
 }
 
+function numberIsInt(number) {
+  return (typeof (number) === 'number') && (number === Math.floor(number));
+}
+
 function ageValidation(age) {
   if (!age || age === '') return 'O campo "age" é obrigatório';
 
-  if (typeof (age) !== 'number' || age < 18) {
+  if (!numberIsInt(age) || age < 18) {
     return 'O campo "age" deve ser um número inteiro igual ou maior que 18';
   }
 }
@@ -18,11 +22,13 @@ function talkValidation(talk) {
   if (!talk) return 'O campo "talk" é obrigatório';
 }
 
-function talkerValidation(talker) {
-  const { name, age, talk } = talker;
+function talkerValidation({ name, age, talk }) {
+  const nameErrorMessage = nameValidation(name);
+  if (nameErrorMessage) return nameErrorMessage;
 
-  nameValidation(name);
-  ageValidation(age);
+  const ageErrorMessage = ageValidation(age);
+  if (ageErrorMessage) return ageErrorMessage;
+
   talkValidation(talk);
 }
 
