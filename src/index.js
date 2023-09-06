@@ -6,7 +6,8 @@ app.use(express.json());
 
 const HTTP_OK_STATUS = 200;
 const HTTP_NOT_FOUND_STATUS = 404;
-// const HTTP_CREATED_STATUS = 201;
+const HTTP_BAD_REQUEST_STATUS = 400;
+const DESIRED_TOKEN_LENGTH = 16;
 
 const PORT = process.env.PORT || '3001';
 
@@ -63,9 +64,40 @@ function createRandomToken(tokenLength) {
   return token;
 }
 
-app.post('/login', (req, res) => {
-  const desiredTokenLength = 16;
-  const token = createRandomToken(desiredTokenLength);
+// requisito 4
+function validateEmail(email) {
+  if (!email || email === '') return 'O campo "email" é obrigatório';
 
+  const regexEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  const emailIsValid = regexEmail.test(email);
+
+  if (!emailIsValid) return 'O "email" deve ter o formato "email@email.com"';
+}
+
+function validatePassword(password) {
+  if (!password || password === '') return 'O campo "password" é obrigatório';
+  
+  if (password.length < 6) return 'O "password" deve ter pelo menos 6 caracteres';
+}
+
+function userInfoValidation(email, password) {
+  const emailErrorMessage = validateEmail(email);
+  if (emailErrorMessage) return emailErrorMessage;
+
+  const passwordErrorMessage = validatePassword(password);
+  if (passwordErrorMessage) return passwordErrorMessage;
+}
+app.post('/login', (req, res) => {
+  const userLoginInfo = { ...req.body };
+  const { email, password } = userLoginInfo;
+  const validationResponse = userInfoValidation(email, password);
+
+  if (validationResponse) { 
+    return res.status(HTTP_BAD_REQUEST_STATUS).json({
+      message: validationResponse,
+    });
+  }
+
+  const token = createRandomToken(DESIRED_TOKEN_LENGTH);
   res.status(HTTP_OK_STATUS).json({ token });
 });
