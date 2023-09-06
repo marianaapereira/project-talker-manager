@@ -1,5 +1,5 @@
 const express = require('express');
-const { readTalkersData } = require('./utils/fsUtils');
+const { readTalkersData, registerNewTalker } = require('./utils/fsUtils');
 const { userInfoValidation } = require('./utils/userValidationFunctions');
 const { createRandomToken, tokenValidation } = require('./utils/tokenFunctions');
 const { talkerValidation } = require('./utils/talkerValidationFunctions');
@@ -80,7 +80,7 @@ function validationResponseManager(res, status, message) {
   }
 
 // requisito 5
-app.post('/talker', (req, res) => {
+app.post('/talker', async (req, res) => {
   const token = req.headers.authorization;
   const tokenValidationResponse = tokenValidation(token, DESIRED_TOKEN_LENGTH);
 
@@ -95,5 +95,6 @@ app.post('/talker', (req, res) => {
     return validationResponseManager(res, HTTP_BAD_REQUEST_STATUS, talkerValidationResponse);
   }
 
-  res.status(HTTP_CREATED_STATUS).json({ newTalkerInfo });
+  await registerNewTalker(newTalkerInfo);
+  res.status(HTTP_CREATED_STATUS).json(newTalkerInfo);
 });

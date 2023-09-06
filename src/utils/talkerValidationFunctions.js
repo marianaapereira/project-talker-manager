@@ -18,8 +18,44 @@ function ageValidation(age) {
   }
 }
 
+function dateIsValid(date) {
+  const regexDate = /^\d{2}\/\d{2}\/\d{4}$/;
+  const dateValidation = regexDate.test(date);
+
+  return dateValidation;
+}
+
+function watchedAtValidation(watchedAt) {
+  if (!watchedAt || watchedAt === '') return 'O campo "watchedAt" é obrigatório';
+
+  if (!dateIsValid(watchedAt)) return 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"';
+}
+
+function checkNumberRange(number, min, max) {
+  return ((number >= min) && (number <= max));
+}
+
+function rateValidation(rate) {
+  if (rate === undefined || rate === null) return 'O campo "rate" é obrigatório';
+
+  const rateIsInt = numberIsInt(rate);
+  const rateIsInCorrectRange = checkNumberRange(rate, 1, 5);
+
+  if (!rateIsInt || !rateIsInCorrectRange) {
+    return 'O campo "rate" deve ser um número inteiro entre 1 e 5';
+  }
+}
+
 function talkValidation(talk) {
   if (!talk) return 'O campo "talk" é obrigatório';
+
+  const { watchedAt, rate } = talk;
+
+  const watchedAtErrorMessage = watchedAtValidation(watchedAt);
+  if (watchedAtErrorMessage) return watchedAtErrorMessage;
+  
+  const rateErrorMessage = rateValidation(rate);
+  if (rateErrorMessage) return rateErrorMessage; 
 }
 
 function talkerValidation({ name, age, talk }) {
@@ -29,7 +65,8 @@ function talkerValidation({ name, age, talk }) {
   const ageErrorMessage = ageValidation(age);
   if (ageErrorMessage) return ageErrorMessage;
 
-  talkValidation(talk);
+  const talkErrorMessage = talkValidation(talk);
+  if (talkErrorMessage) return talkErrorMessage;
 }
 
 module.exports = {
