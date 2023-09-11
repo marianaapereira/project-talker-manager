@@ -7,11 +7,10 @@ const { talkerValidation } = require('./utils/talkerValidationFunctions');
 const app = express();
 app.use(express.json());
 
-const HTTP_OK_STATUS = 200;
-const HTTP_BAD_REQUEST_STATUS = 400;
-const HTTP_UNAUTHORIZED_STATUS = 401;
-const HTTP_NOT_FOUND_STATUS = 404;
-const HTTP_CREATED_STATUS = 201;
+const {
+  HTTP_OK_STATUS, HTTP_CREATED_STATUS, HTTP_BAD_REQUEST_STATUS, HTTP_UNAUTHORIZED_STATUS,
+  HTTP_NOT_FOUND_STATUS, 
+} = require('./data/http-status-codes');
 
 const DESIRED_TOKEN_LENGTH = 16;
 
