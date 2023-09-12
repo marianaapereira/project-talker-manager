@@ -8,8 +8,7 @@ const app = express();
 app.use(express.json());
 
 const {
-  HTTP_OK_STATUS, HTTP_CREATED_STATUS, HTTP_BAD_REQUEST_STATUS, HTTP_UNAUTHORIZED_STATUS,
-  HTTP_NOT_FOUND_STATUS, 
+  HTTP_OK_STATUS, HTTP_CREATED_STATUS, HTTP_BAD_REQUEST_STATUS, HTTP_UNAUTHORIZED_STATUS, HTTP_NOT_FOUND_STATUS, 
 } = require('./data/http-status-codes');
 
 const DESIRED_TOKEN_LENGTH = 16;
@@ -44,15 +43,11 @@ app.get('/talker/:id', async (req, res) => {
     const { id } = req.params;
     const requiredTalker = talkerArray.find((talker) => talker.id === Number(id));
 
-    if (!requiredTalker) {
-      return res.status(HTTP_NOT_FOUND_STATUS).json({
-        message: 'Pessoa palestrante não encontrada',
-      });
-    }
+    if (!requiredTalker) throw new Error('Pessoa palestrante não encontrada');
 
     return res.status(HTTP_OK_STATUS).json(requiredTalker);
   } catch (error) {
-    console.error(`Pessoa palestrante não encontrada! Mensagem de erro: ${error}`);
+    return res.status(HTTP_NOT_FOUND_STATUS).json({ message: error.message });
   }
 });
 
