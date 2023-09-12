@@ -56,34 +56,59 @@ app.post('/login', (req, res) => {
     userInfoValidation(email, password);
   
     const token = createRandomToken(DESIRED_TOKEN_LENGTH);
-    res.status(HTTP_OK_STATUS).json({ token });
+    return res.status(HTTP_OK_STATUS).json({ token });
   } catch ({ message }) {
     return res.status(HTTP_BAD_REQUEST_STATUS).json({ message });
   }
 });
 
-function validationResponseManager(res, status, message) {
-    return res.status(status).json({
-      message,
-    });
-  }
+// requisito 5 novo
 
-// requisito 5
+function validateToken(token, res) {
+  try {
+    tokenValidation(token);
+  } catch ({ message }) {
+    return res.status(HTTP_UNAUTHORIZED_STATUS).json({ message });
+  }
+}
+
 app.post('/talker', async (req, res) => {
-  const token = req.headers.authorization;
-  const tokenValidationResponse = tokenValidation(token, DESIRED_TOKEN_LENGTH);
+  try {
+    validateToken(req.headers.authorization, res);
 
-  if (tokenValidationResponse) {
-    return validationResponseManager(res, HTTP_UNAUTHORIZED_STATUS, tokenValidationResponse);
+    const newTalker = { ...req.body };
+    talkerValidation(newTalker);
+  
+    const addedTalker = await registerNewTalker(newTalker);
+    return res.status(HTTP_CREATED_STATUS).json(addedTalker);
+  } catch ({ message }) {
+    return res.status(HTTP_BAD_REQUEST_STATUS).json({ message });
   }
-
-  const newTalkerInfo = { ...req.body };
-  const talkerValidationResponse = talkerValidation(newTalkerInfo);
-
-  if (talkerValidationResponse) {
-    return validationResponseManager(res, HTTP_BAD_REQUEST_STATUS, talkerValidationResponse);
-  }
-
-  const addedTalker = await registerNewTalker(newTalkerInfo);
-  res.status(HTTP_CREATED_STATUS).json(addedTalker);
 });
+
+// requisito 5 antigo
+
+// function validationResponseManager(res, status, message) {
+//   return res.status(status).json({
+//     message,
+//   });
+// }
+
+// app.post('/talker', async (req, res) => {
+//   const token = req.headers.authorization;
+//   const tokenValidationResponse = tokenValidation(token, DESIRED_TOKEN_LENGTH);
+
+//   if (tokenValidationResponse) {
+//     return validationResponseManager(res, HTTP_UNAUTHORIZED_STATUS, tokenValidationResponse);
+//   }
+
+//   const newTalkerInfo = { ...req.body };
+//   const talkerValidationResponse = talkerValidation(newTalkerInfo);
+
+//   if (talkerValidationResponse) {
+//     return validationResponseManager(res, HTTP_BAD_REQUEST_STATUS, talkerValidationResponse);
+//   }
+
+//   const addedTalker = await registerNewTalker(newTalkerInfo);
+//   res.status(HTTP_CREATED_STATUS).json(addedTalker);
+// });
