@@ -5,7 +5,9 @@ const MINIMUN_NAME_LENGTH = 3;
 // general
 
 function findTalkerById(talkerArray, talkerId) {
-  return talkerArray.find((talker) => talker.id === Number(talkerId));
+  const requiredTalker = talkerArray.find((talker) => talker.id === Number(talkerId));
+  if (!requiredTalker) throw new Error('Pessoa palestrante não encontrada');
+  return requiredTalker;
 }
 
 // validations

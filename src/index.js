@@ -43,8 +43,6 @@ app.get('/talker/:id', async (req, res) => {
     const { id } = req.params;
     const requiredTalker = findTalkerById(talkerArray, id);
 
-    if (!requiredTalker) throw new Error('Pessoa palestrante não encontrada');
-
     return res.status(HTTP_OK_STATUS).json(requiredTalker);
   } catch (error) {
     return res.status(HTTP_NOT_FOUND_STATUS).json({ message: error.message });
