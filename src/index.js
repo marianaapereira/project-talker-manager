@@ -1,10 +1,10 @@
 // eslint-disable-next-line import/no-unresolved
 const express = require('express');
 
-const { readTalkersData, registerNewTalker } = require('./utils/fsUtils');
+const { readTalkersData, registerNewTalker, updateTalker } = require('./utils/fsUtils');
 const { userInfoValidation } = require('./utils/userValidationFunctions');
 const { createRandomToken, tokenValidation } = require('./utils/tokenFunctions');
-const { talkerValidation, findTalkerById } = require('./utils/talkerFunctions');
+const { talkerValidation, findTalkerById, createTalkerId } = require('./utils/talkerFunctions');
 
 const app = express();
 app.use(express.json());
@@ -32,35 +32,44 @@ app.get('/talker', async (req, res) => {
     const talkerArray = await readTalkersData();
     return res.status(HTTP_OK_STATUS).json(talkerArray);
   } catch (error) {
-    console.error(`Não há pessoas palestrantes cadastradas! Mensagem de erro: ${error}`);
     return res.status(HTTP_OK_STATUS).json([]);
   }
 });
 
-// requisito 2
-app.get('/talker/:id', async (req, res) => {
+// middleware
+const talkerExists = async (req, res, next) => {
   try {
-    const talkerArray = await readTalkersData();
-    const { id } = req.params;
-    const requiredTalker = findTalkerById(talkerArray, id);
-
-    return res.status(HTTP_OK_STATUS).json(requiredTalker);
+    const talkerId = req.params.id;
+    await findTalkerById(talkerId);
+    next();
   } catch ({ message }) {
     return res.status(HTTP_NOT_FOUND_STATUS).json({ message });
   }
+};
+
+// requisito 2
+app.get('/talker/:id', talkerExists, async (req, res) => {
+  const { id } = req.params;
+  const requiredTalker = await findTalkerById(id);
+
+  return res.status(HTTP_OK_STATUS).json(requiredTalker);
 });
 
-// requisitos 3 e 4
-app.post('/login', (req, res) => {
+// middleware
+const validateUser = (req, res, next) => {
   try {
     const { email, password } = { ...req.body };
     userInfoValidation(email, password);
-  
-    const token = createRandomToken();
-    return res.status(HTTP_OK_STATUS).json({ token });
+    next();
   } catch ({ message }) {
     return res.status(HTTP_BAD_REQUEST_STATUS).json({ message });
   }
+};
+
+// requisitos 3 e 4
+app.post('/login', validateUser, (req, res) => {
+  const token = createRandomToken();
+  return res.status(HTTP_OK_STATUS).json({ token });
 });
 
 // middlewares
@@ -87,19 +96,15 @@ const validateTalker = (req, res, next) => {
 // requisito 5
 app.post('/talker', validateToken, validateTalker, async (req, res) => {
   const newTalker = { ...req.body };
-  const addedTalker = await registerNewTalker(newTalker);
+  const newTalkerWithId = await createTalkerId(newTalker);
+  const addedTalker = await registerNewTalker(newTalkerWithId);
   return res.status(HTTP_CREATED_STATUS).json(addedTalker);
 });
 
 // requisito 6
-// app.put('/talker/:id', validateToken, validateTalker, async (req, res) => {
-
-//   const oldTalkerArray = await readTalkersData();
-//   findTalkerById(oldTalkerArray, idTalkerToUpdate);
-
-//   const idTalkerToUpdate = req.params.id;
-//   const updatedTalker = await updateTalker(talkerToUpdate, idTalkerToUpdate);
-//   res.status(HTTP_OK_STATUS).json(updatedTalker);
-// } catch ({ message, httpStatusCode }) {
-//   return res.status(httpStatusCode).json({ message });
-// });
+app.put('/talker/:id', validateToken, validateTalker, talkerExists, async (req, res) => {
+  const newTalkerData = { ...req.body };
+  const idTalkerToUpdate = req.params.id;
+  const updatedTalker = await updateTalker(newTalkerData, idTalkerToUpdate);
+  res.status(HTTP_OK_STATUS).json(updatedTalker);
+});

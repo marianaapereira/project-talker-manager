@@ -1,6 +1,5 @@
 const fs = require('fs').promises;
 const { resolve } = require('path');
-const { createTalkerId } = require('./talkerFunctions');
 
 const TALKER_DATA_PATH = '../talker.json';
 
@@ -15,10 +14,9 @@ async function readTalkersData() {
   }
 }
 
-async function registerNewTalker(talker) {
+async function registerNewTalker(newTalker) {
   try {
     const oldTalkerArray = await readTalkersData();
-    const newTalker = createTalkerId(talker, oldTalkerArray);
     const allTalkers = JSON.stringify([...oldTalkerArray, newTalker]);
     await fs.writeFile(resolve(__dirname, TALKER_DATA_PATH), allTalkers);
 
