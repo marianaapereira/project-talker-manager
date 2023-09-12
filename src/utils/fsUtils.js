@@ -37,8 +37,20 @@ async function updateTalker(oldTalkerData, newTalkerData) {
   }
 }
 
+async function deleteTalker(talkerId) {
+  try {
+    const oldTalkerArray = await readTalkersData();
+    const newTalkerArray = JSON.stringify(oldTalkerArray
+      .filter((talker) => talker.id !== Number(talkerId)));
+    await fs.writeFile(resolve(__dirname, TALKER_DATA_PATH), newTalkerArray);
+  } catch (error) {
+    console.error(`Erro ao deletar o arquivo: ${error}`);
+  }
+}
+
 module.exports = {
   readTalkersData,
   writeNewTalker,
   updateTalker,
+  deleteTalker,
 };

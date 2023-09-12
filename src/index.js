@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 const express = require('express');
 
-const { readTalkersData, writeNewTalker, updateTalker } = require('./utils/fsUtils');
+const { readTalkersData, writeNewTalker, updateTalker, deleteTalker } = require('./utils/fsUtils');
 const { userInfoValidation } = require('./utils/userValidationFunctions');
 const { createRandomToken, tokenValidation } = require('./utils/tokenFunctions');
 const { talkerValidation, findTalkerById, createTalkerId } = require('./utils/talkerFunctions');
@@ -11,7 +11,7 @@ app.use(express.json());
 
 const {
   HTTP_OK_STATUS, HTTP_CREATED_STATUS, HTTP_BAD_REQUEST_STATUS,
-  HTTP_NOT_FOUND_STATUS, HTTP_UNAUTHORIZED_STATUS,
+  HTTP_NOT_FOUND_STATUS, HTTP_UNAUTHORIZED_STATUS, HTTP_NO_CONTENT_STATUS,
 } = require('./consts/http-status-codes');
 
 const PORT = process.env.PORT || '3001';
@@ -108,6 +108,13 @@ app.put('/talker/:id', validateToken, validateTalker, talkerExists, async (req, 
   const newTalkerData = { ...req.body };
   const updatedTalker = await updateTalker(oldTalkerData, newTalkerData);
 
-  console.log(updatedTalker);
   return res.status(HTTP_OK_STATUS).json(updatedTalker);
+});
+
+// requisito 7
+app.delete('/talker/:id', validateToken, async (req, res) => {
+  const idTalkerToDelete = req.params.id;
+  await deleteTalker(idTalkerToDelete);
+
+  return res.status(HTTP_NO_CONTENT_STATUS).end();
 });
