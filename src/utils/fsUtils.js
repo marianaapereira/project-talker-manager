@@ -14,7 +14,7 @@ async function readTalkersData() {
   }
 }
 
-async function registerNewTalker(newTalker) {
+async function writeNewTalker(newTalker) {
   try {
     const oldTalkerArray = await readTalkersData();
     const allTalkers = JSON.stringify([...oldTalkerArray, newTalker]);
@@ -26,20 +26,12 @@ async function registerNewTalker(newTalker) {
   }
 }
 
-async function updateTalker(talkerToUpdate, idTalkerToUpdate) {
+async function updateTalker(oldTalkerData, newTalkerData) {
   try {
-    const oldTalkerArray = await readTalkersData();
+    const updatedTalkerData = { ...oldTalkerData, ...newTalkerData };
+    const updatedTalker = await writeNewTalker(updatedTalkerData);
 
-    // edição do talker
-
-    oldTalkerArray.map((talker) => {
-      if (talker.id === idTalkerToUpdate) {
-        const updatedTalker = { ...talker, ...talkerToUpdate };
-        return updatedTalker;
-      } 
-      
-      throw new Error('deu ruim minina');
-    });
+    return updatedTalker;
   } catch (error) {
     console.error(`Erro na edição do arquivo: ${error}`);
   }
@@ -47,6 +39,6 @@ async function updateTalker(talkerToUpdate, idTalkerToUpdate) {
 
 module.exports = {
   readTalkersData,
-  registerNewTalker,
+  writeNewTalker,
   updateTalker,
 };

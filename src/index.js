@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-unresolved
 const express = require('express');
 
-const { readTalkersData, registerNewTalker, updateTalker } = require('./utils/fsUtils');
+const { readTalkersData, writeNewTalker, updateTalker } = require('./utils/fsUtils');
 const { userInfoValidation } = require('./utils/userValidationFunctions');
 const { createRandomToken, tokenValidation } = require('./utils/tokenFunctions');
 const { talkerValidation, findTalkerById, createTalkerId } = require('./utils/talkerFunctions');
@@ -51,7 +51,6 @@ const talkerExists = async (req, res, next) => {
 app.get('/talker/:id', talkerExists, async (req, res) => {
   const { id } = req.params;
   const requiredTalker = await findTalkerById(id);
-
   return res.status(HTTP_OK_STATUS).json(requiredTalker);
 });
 
@@ -97,14 +96,18 @@ const validateTalker = (req, res, next) => {
 app.post('/talker', validateToken, validateTalker, async (req, res) => {
   const newTalker = { ...req.body };
   const newTalkerWithId = await createTalkerId(newTalker);
-  const addedTalker = await registerNewTalker(newTalkerWithId);
+  const addedTalker = await writeNewTalker(newTalkerWithId);
   return res.status(HTTP_CREATED_STATUS).json(addedTalker);
 });
 
 // requisito 6
 app.put('/talker/:id', validateToken, validateTalker, talkerExists, async (req, res) => {
-  const newTalkerData = { ...req.body };
   const idTalkerToUpdate = req.params.id;
-  const updatedTalker = await updateTalker(newTalkerData, idTalkerToUpdate);
-  res.status(HTTP_OK_STATUS).json(updatedTalker);
+  const oldTalkerData = await findTalkerById(idTalkerToUpdate);
+
+  const newTalkerData = { ...req.body };
+  const updatedTalker = await updateTalker(oldTalkerData, newTalkerData);
+
+  console.log(updatedTalker);
+  return res.status(HTTP_OK_STATUS).json(updatedTalker);
 });
