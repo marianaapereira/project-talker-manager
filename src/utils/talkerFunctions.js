@@ -1,4 +1,14 @@
+// const
+
 const MINIMUN_NAME_LENGTH = 3;
+
+// general
+
+function findTalkerById(talkerArray, talkerId) {
+  return talkerArray.find((talker) => talker.id === Number(talkerId));
+}
+
+// validations
 
 function nameValidation(name) {
   if (!name || name === '') return 'O campo "name" é obrigatório';
@@ -70,5 +80,6 @@ function talkerValidation({ name, age, talk }) {
 }
 
 module.exports = {
+  findTalkerById,
   talkerValidation,
 };

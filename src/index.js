@@ -2,7 +2,7 @@ const express = require('express');
 const { readTalkersData, registerNewTalker } = require('./utils/fsUtils');
 const { userInfoValidation } = require('./utils/userValidationFunctions');
 const { createRandomToken, tokenValidation } = require('./utils/tokenFunctions');
-const { talkerValidation } = require('./utils/talkerValidationFunctions');
+const { talkerValidation, findTalkerById } = require('./utils/talkerFunctions');
 
 const app = express();
 app.use(express.json());
@@ -41,7 +41,7 @@ app.get('/talker/:id', async (req, res) => {
   try {
     const talkerArray = await readTalkersData();
     const { id } = req.params;
-    const requiredTalker = talkerArray.find((talker) => talker.id === Number(id));
+    const requiredTalker = findTalkerById(talkerArray, id);
 
     if (!requiredTalker) throw new Error('Pessoa palestrante não encontrada');
 
