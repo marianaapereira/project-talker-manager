@@ -15,7 +15,9 @@ function createRandomToken() {
 function tokenValidation(token) {
   if (!token || token === '') throw new Error('Token não encontrado');
 
-  if (token.length !== DESIRED_TOKEN_LENGTH || typeof (token) !== 'string') throw new Error('Token inválido');
+  if (token.length !== DESIRED_TOKEN_LENGTH || typeof (token) !== 'string') { 
+    throw new Error('Token inválido'); 
+}
 }
 
 module.exports = {

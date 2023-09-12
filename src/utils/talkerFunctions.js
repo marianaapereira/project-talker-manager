@@ -1,4 +1,4 @@
-const {   numberIsInt,dateIsValid, checkNumberRange, } = require('./generalFunctions');
+const { numberIsInt, dateIsValid, checkNumberRange } = require('./generalFunctions');
 
 // const
 
@@ -19,7 +19,9 @@ function findTalkerById(talkerArray, talkerId) {
 function nameValidation(name) {
   if (!name || name === '') throw new Error('O campo "name" é obrigatório');
 
-  if (name.length < MINIMUN_NAME_LENGTH) throw new Error('O "name" deve ter pelo menos 3 caracteres');
+  if (name.length < MINIMUN_NAME_LENGTH) { 
+    throw new Error('O "name" deve ter pelo menos 3 caracteres'); 
+  }
 }
 
 function ageValidation(age) {
@@ -33,7 +35,9 @@ function ageValidation(age) {
 function watchedAtValidation(watchedAt) {
   if (!watchedAt || watchedAt === '') throw new Error('O campo "watchedAt" é obrigatório');
 
-  if (!dateIsValid(watchedAt)) throw new Error('O campo "watchedAt" deve ter o formato "dd/mm/aaaa"');
+  if (!dateIsValid(watchedAt)) {
+     throw new Error('O campo "watchedAt" deve ter o formato "dd/mm/aaaa"'); 
+  }
 }
 
 function rateValidation(rate) {

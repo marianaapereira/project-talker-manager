@@ -1,4 +1,5 @@
 const express = require('express');
+
 const { readTalkersData, registerNewTalker } = require('./utils/fsUtils');
 const { userInfoValidation } = require('./utils/userValidationFunctions');
 const { createRandomToken, tokenValidation } = require('./utils/tokenFunctions');
@@ -8,10 +9,9 @@ const app = express();
 app.use(express.json());
 
 const {
-  HTTP_OK_STATUS, HTTP_CREATED_STATUS, HTTP_BAD_REQUEST_STATUS, HTTP_UNAUTHORIZED_STATUS, HTTP_NOT_FOUND_STATUS, 
+  HTTP_OK_STATUS, HTTP_CREATED_STATUS, HTTP_BAD_REQUEST_STATUS, 
+  HTTP_UNAUTHORIZED_STATUS, HTTP_NOT_FOUND_STATUS, 
 } = require('./data/http-status-codes');
-
-const DESIRED_TOKEN_LENGTH = 16;
 
 const PORT = process.env.PORT || '3001';
 
@@ -55,7 +55,7 @@ app.post('/login', (req, res) => {
     const { email, password } = { ...req.body };
     userInfoValidation(email, password);
   
-    const token = createRandomToken(DESIRED_TOKEN_LENGTH);
+    const token = createRandomToken();
     return res.status(HTTP_OK_STATUS).json({ token });
   } catch ({ message }) {
     return res.status(HTTP_BAD_REQUEST_STATUS).json({ message });
