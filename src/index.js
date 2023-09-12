@@ -64,18 +64,22 @@ app.post('/login', (req, res) => {
 
 // requisito 5 novo
 
-function validateToken(token, res) {
+// function validateToken(token, res) {
+//   try {
+//     tokenValidation(token);
+//   } catch ({ message }) {
+//     return res.status(HTTP_UNAUTHORIZED_STATUS).json({ message });
+//   }
+// }
+
+app.post('/talker', async (req, res) => {
   try {
+    const token = req.headers.authorization;
     tokenValidation(token);
   } catch ({ message }) {
     return res.status(HTTP_UNAUTHORIZED_STATUS).json({ message });
   }
-}
-
-app.post('/talker', async (req, res) => {
-  try {
-    validateToken(req.headers.authorization, res);
-
+try {
     const newTalker = { ...req.body };
     talkerValidation(newTalker);
   
@@ -85,30 +89,3 @@ app.post('/talker', async (req, res) => {
     return res.status(HTTP_BAD_REQUEST_STATUS).json({ message });
   }
 });
-
-// requisito 5 antigo
-
-// function validationResponseManager(res, status, message) {
-//   return res.status(status).json({
-//     message,
-//   });
-// }
-
-// app.post('/talker', async (req, res) => {
-//   const token = req.headers.authorization;
-//   const tokenValidationResponse = tokenValidation(token, DESIRED_TOKEN_LENGTH);
-
-//   if (tokenValidationResponse) {
-//     return validationResponseManager(res, HTTP_UNAUTHORIZED_STATUS, tokenValidationResponse);
-//   }
-
-//   const newTalkerInfo = { ...req.body };
-//   const talkerValidationResponse = talkerValidation(newTalkerInfo);
-
-//   if (talkerValidationResponse) {
-//     return validationResponseManager(res, HTTP_BAD_REQUEST_STATUS, talkerValidationResponse);
-//   }
-
-//   const addedTalker = await registerNewTalker(newTalkerInfo);
-//   res.status(HTTP_CREATED_STATUS).json(addedTalker);
-// });
