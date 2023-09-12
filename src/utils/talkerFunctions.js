@@ -6,6 +6,13 @@ const MINIMUN_NAME_LENGTH = 3;
 
 // general
 
+function createTalkerId(talker, talkerArray) {
+  const lastId = talkerArray[(talkerArray.length - 1)].id;
+  const newId = lastId + 1;
+
+  return { ...talker, id: newId };
+}
+
 function findTalkerById(talkerArray, talkerId) {
   const requiredTalker = talkerArray.find((talker) => talker.id === Number(talkerId));
 
@@ -67,6 +74,7 @@ function talkerValidation({ name, age, talk }) {
 }
 
 module.exports = {
+  createTalkerId,
   findTalkerById,
   talkerValidation,
 };

@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const { resolve } = require('path');
+const { createTalkerId } = require('./talkerFunctions');
 
 const TALKER_DATA_PATH = '../talker.json';
 
@@ -12,13 +13,6 @@ async function readTalkersData() {
   } catch (error) {
     console.error(`Erro na leitura do arquivo: ${error}`);
   }
-}
-
-function createTalkerId(talker, talkerArray) {
-  const lastId = talkerArray[(talkerArray.length - 1)].id;
-  const newId = lastId + 1;
-
-  return { ...talker, id: newId };
 }
 
 async function registerNewTalker(talker) {
