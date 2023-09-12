@@ -15,10 +15,10 @@ function validatePassword(password) {
 
 function userInfoValidation(email, password) {
   const emailErrorMessage = validateEmail(email);
-  if (emailErrorMessage) return emailErrorMessage;
+  if (emailErrorMessage) throw new Error(emailErrorMessage);
 
   const passwordErrorMessage = validatePassword(password);
-  if (passwordErrorMessage) return passwordErrorMessage;
+  if (passwordErrorMessage) throw new Error(passwordErrorMessage);
 }
 
 module.exports = {

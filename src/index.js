@@ -44,25 +44,22 @@ app.get('/talker/:id', async (req, res) => {
     const requiredTalker = findTalkerById(talkerArray, id);
 
     return res.status(HTTP_OK_STATUS).json(requiredTalker);
-  } catch (error) {
-    return res.status(HTTP_NOT_FOUND_STATUS).json({ message: error.message });
+  } catch ({ message }) {
+    return res.status(HTTP_NOT_FOUND_STATUS).json({ message });
   }
 });
 
 // requisitos 3 e 4
 app.post('/login', (req, res) => {
-  const userLoginInfo = { ...req.body };
-  const { email, password } = userLoginInfo;
-  const validationResponse = userInfoValidation(email, password);
-
-  if (validationResponse) { 
-    return res.status(HTTP_BAD_REQUEST_STATUS).json({
-      message: validationResponse,
-    });
+  try {
+    const { email, password } = { ...req.body };
+    userInfoValidation(email, password);
+  
+    const token = createRandomToken(DESIRED_TOKEN_LENGTH);
+    res.status(HTTP_OK_STATUS).json({ token });
+  } catch ({ message }) {
+    return res.status(HTTP_BAD_REQUEST_STATUS).json({ message });
   }
-
-  const token = createRandomToken(DESIRED_TOKEN_LENGTH);
-  res.status(HTTP_OK_STATUS).json({ token });
 });
 
 function validationResponseManager(res, status, message) {
