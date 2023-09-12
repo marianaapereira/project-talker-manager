@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 const express = require('express');
 
 const { readTalkersData, registerNewTalker } = require('./utils/fsUtils');
@@ -9,9 +10,9 @@ const app = express();
 app.use(express.json());
 
 const {
-  HTTP_OK_STATUS, HTTP_CREATED_STATUS, HTTP_BAD_REQUEST_STATUS, 
-  HTTP_UNAUTHORIZED_STATUS, HTTP_NOT_FOUND_STATUS, 
-} = require('./data/http-status-codes');
+  HTTP_OK_STATUS, HTTP_CREATED_STATUS, HTTP_BAD_REQUEST_STATUS,
+  HTTP_NOT_FOUND_STATUS, HTTP_UNAUTHORIZED_STATUS,
+} = require('./consts/http-status-codes');
 
 const PORT = process.env.PORT || '3001';
 
@@ -62,16 +63,7 @@ app.post('/login', (req, res) => {
   }
 });
 
-// requisito 5 novo
-
-// function validateToken(token, res) {
-//   try {
-//     tokenValidation(token);
-//   } catch ({ message }) {
-//     return res.status(HTTP_UNAUTHORIZED_STATUS).json({ message });
-//   }
-// }
-
+// requisito 5
 app.post('/talker', async (req, res) => {
   try {
     const token = req.headers.authorization;
@@ -79,7 +71,8 @@ app.post('/talker', async (req, res) => {
   } catch ({ message }) {
     return res.status(HTTP_UNAUTHORIZED_STATUS).json({ message });
   }
-try {
+
+  try {
     const newTalker = { ...req.body };
     talkerValidation(newTalker);
   
@@ -89,3 +82,25 @@ try {
     return res.status(HTTP_BAD_REQUEST_STATUS).json({ message });
   }
 });
+
+// requisito 6 novo
+// app.put('/talker/:id', async (req, res) => {
+//   try { 
+//     // validação do token
+//     const token = req.headers.authorization;
+//     tokenValidation(token);
+
+//     // validação de infos do talker recebido
+//     const talkerToUpdate = { ...req.body };
+//     talkerValidation(talkerToUpdate);
+
+//     const oldTalkerArray = await readTalkersData();
+//     findTalkerById(oldTalkerArray, idTalkerToUpdate);
+  
+//     const idTalkerToUpdate = req.params.id;
+//     const updatedTalker = await updateTalker(talkerToUpdate, idTalkerToUpdate);
+//     res.status(HTTP_OK_STATUS).json(updatedTalker);
+//   } catch ({ message, httpStatusCode }) {
+//    return res.status(httpStatusCode).json({ message });
+//  }
+//  });

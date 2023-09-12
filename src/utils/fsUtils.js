@@ -28,7 +28,27 @@ async function registerNewTalker(talker) {
   }
 }
 
+async function updateTalker(talkerToUpdate, idTalkerToUpdate) {
+  try {
+    const oldTalkerArray = await readTalkersData();
+
+    // edição do talker
+
+    oldTalkerArray.map((talker) => {
+      if (talker.id === idTalkerToUpdate) {
+        const updatedTalker = { ...talker, ...talkerToUpdate };
+        return updatedTalker;
+      } 
+      
+      throw new Error('deu ruim minina');
+    });
+  } catch (error) {
+    console.error(`Erro na edição do arquivo: ${error}`);
+  }
+}
+
 module.exports = {
   readTalkersData,
   registerNewTalker,
+  updateTalker,
 };
