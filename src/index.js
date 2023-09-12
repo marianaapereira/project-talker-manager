@@ -63,7 +63,7 @@ app.post('/login', (req, res) => {
   }
 });
 
-// middleware
+// middlewares
 const validateToken = (req, res, next) => {
   try {
     const token = req.headers.authorization;
@@ -74,42 +74,32 @@ const validateToken = (req, res, next) => {
   }
 };
 
-// requisito 5
-app.post('/talker', validateToken, async (req, res) => {
-  try {
-    const newTalker = { ...req.body };
-    talkerValidation(newTalker);
-  
-    const addedTalker = await registerNewTalker(newTalker);
-    return res.status(HTTP_CREATED_STATUS).json(addedTalker);
+const validateTalker = (req, res, next) => {
+  try { 
+    const talker = { ...req.body };
+    talkerValidation(talker);
+    next();
   } catch ({ message }) {
     return res.status(HTTP_BAD_REQUEST_STATUS).json({ message });
   }
+};
+
+// requisito 5
+app.post('/talker', validateToken, validateTalker, async (req, res) => {
+  const newTalker = { ...req.body };
+  const addedTalker = await registerNewTalker(newTalker);
+  return res.status(HTTP_CREATED_STATUS).json(addedTalker);
 });
 
-// requisito 6 novo
-// app.put('/talker/:id', async (req, res) => {
-//     try { // validação do token
-//       const token = req.headers.authorization;
-//       tokenValidation(token);
-//     } catch ({ message }) {
-//       return res.status(HTTP_UNAUTHORIZED_STATUS).json({ message });
-//     }
+// requisito 6
+// app.put('/talker/:id', validateToken, validateTalker, async (req, res) => {
 
-//     try { // validação de infos do talker recebido
-//       const talkerToUpdate = { ...req.body };
-//       talkerValidation(talkerToUpdate);
-//     } catch ({ message }) {
+//   const oldTalkerArray = await readTalkersData();
+//   findTalkerById(oldTalkerArray, idTalkerToUpdate);
 
-//     }
-
-//     const oldTalkerArray = await readTalkersData();
-//     findTalkerById(oldTalkerArray, idTalkerToUpdate);
-
-//     const idTalkerToUpdate = req.params.id;
-//     const updatedTalker = await updateTalker(talkerToUpdate, idTalkerToUpdate);
-//     res.status(HTTP_OK_STATUS).json(updatedTalker);
-//   } catch ({ message, httpStatusCode }) {
-//     return res.status(httpStatusCode).json({ message });
-//   }
+//   const idTalkerToUpdate = req.params.id;
+//   const updatedTalker = await updateTalker(talkerToUpdate, idTalkerToUpdate);
+//   res.status(HTTP_OK_STATUS).json(updatedTalker);
+// } catch ({ message, httpStatusCode }) {
+//   return res.status(httpStatusCode).json({ message });
 // });
